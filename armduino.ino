@@ -1,14 +1,17 @@
 #include <Servo.h> 
 #include "functions.h"
+//Servo Motors PINS 3/5/6/9
 #define SER_A_PIN 3
 #define SER_B_PIN 5
 #define SER_C_PIN 6
 #define SER_D_PIN 9
+//LED PINS 12/13
 #define LED_WORKING 13
 #define LED_STANDBY 12
-#define INIT_ANGLE 90
-int potpin = 0;  
-int SensVal[4],ist[4] ;
+#define INIT_ANGLE 90 //Defualt Angle 90 degree
+int potpin = 0;  // Potentiometer input PIN 0
+int SensVal[4]; // Servo Arrays for Store  Analog Value
+int ist[4] ; // Servo Position After Mapping Analog Value 
 int arrayStep=0;
 int joint0[180];
 int top = 179;
@@ -27,7 +30,7 @@ void setup()
   pinMode(LED_WORKING, OUTPUT);
   servo_A.attach(SER_A_PIN); 
   servo_B.attach(SER_B_PIN); 
-  servo_C.attach(SER_C_PIN); 
+  servo_C.attach(SER_C_PIN);
   servo_D.attach(SER_D_PIN); 
   init_servo();
   Serial.begin(9600);
