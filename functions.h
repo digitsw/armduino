@@ -1,10 +1,10 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
-void init_servo();
-void working();
-void readpot();
-void free_mode();
-void standby();
-void record();
-void play();
+extern void init_servo();
+extern void working();
+extern void readpot();
+extern void free_mode();
+extern void standby();
+extern void record();
+extern void play();
 #endif

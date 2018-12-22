@@ -19,7 +19,6 @@ int recordButtonPin = 11;
 int playButtonPin = 2;
 int ste=0;
 Servo servo_A,servo_B,servo_C,servo_D;
-String readString;
 
 void setup()
 {
