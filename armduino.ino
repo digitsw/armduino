@@ -8,37 +8,38 @@
 //LED PINS 12/13
 #define LED_WORKING 13
 #define LED_STANDBY 12
+//Buttons PINS 2/11
+#define RECORD_BUTT 11
+#define PLAY_BUTT 2
 #define INIT_ANGLE 90 //Defualt Angle 90 degree
-int potpin = 0;  // Potentiometer input PIN 0
-int SensVal[4]; // Servo Arrays for Store  Analog Value
-int ist[4] ; // Servo Position After Mapping Analog Value 
-int arrayStep=0;
-int joint0[180];
-int top = 179;
-int recordButtonPin = 11;
-int playButtonPin = 2;
-int ste=0;
+uint16_t potpin = 0;  // Potentiometer input PIN 0
+uint16_t SensVal[4]; // Servo Arrays for Store  Analog Value
+uint16_t ist[4] ; // Servo to store position  after Mapping Analog Value 
+uint16_t arrayStep=0; // Array change steps to store it in array steps 
+uint16_t joint0[180]; // Array for Store steps for one servo 
+uint16_t top = 179; // max steps
+uint16_t ste=0;
 Servo servo_A,servo_B,servo_C,servo_D;
 
 void setup()
 {
-  pinMode(recordButtonPin, INPUT);
-  pinMode(recordButtonPin, HIGH);
-  pinMode(playButtonPin, INPUT);
-  pinMode(LED_STANDBY, OUTPUT);
-  pinMode(LED_WORKING, OUTPUT);
-  servo_A.attach(SER_A_PIN); 
-  servo_B.attach(SER_B_PIN); 
-  servo_C.attach(SER_C_PIN);
-  servo_D.attach(SER_D_PIN); 
-  init_servo();
-  Serial.begin(9600);
+    pinMode(RECORD_BUTT, INPUT);
+    pinMode(RECORD_BUTT, HIGH);
+    pinMode(PLAY_BUTT, INPUT);
+    pinMode(LED_STANDBY, OUTPUT);
+    pinMode(LED_WORKING, OUTPUT);
+    servo_A.attach(SER_A_PIN); 
+    servo_B.attach(SER_B_PIN); 
+    servo_C.attach(SER_C_PIN);
+    servo_D.attach(SER_D_PIN); 
+    init_servo(); // set & write all servo angle to INIT_ANGLE
+    Serial.begin(9600);
 }
 void loop()
 {
-    readpot();
+    readpot(); 
     free_mode();
-    while (digitalRead(recordButtonPin)==true)
+    while (digitalRead(RECORD_BUTT)==true)
         {
             working();
             readpot();
@@ -50,21 +51,24 @@ void loop()
             arrayStep+=1;
             delay(100);
         }
-    while (digitalRead(playButtonPin)==true)
-         {
-             working();
-             if(ste<top)
-                 {
-                     play();
-                     ste+=1;
-                     delay(25);
-                 }
-             else ste=0;
-         }
+    while (digitalRead(PLAY_BUTT)==true)
+        {
+            working();
+            if(ste<top)
+                {
+                    play();
+                    ste+=1;
+                    delay(25);
+                }
+            else ste=0;
+        }
 
 
 
 }
+/* working() 
+   funtion for turn on LED working
+   when Servo  change angle */  
 void working()
 {
     Serial.println("Working ");
