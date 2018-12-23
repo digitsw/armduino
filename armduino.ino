@@ -15,7 +15,7 @@
 uint16_t potpin = 0;  // Potentiometer input PIN 0
 uint16_t SensVal[4]; // Servo Arrays for Store  Analog Value
 uint16_t ist[4] ; // Servo to store position  after Mapping Analog Value 
-uint16_t arrayStep=0; // Array change steps to store it in array steps 
+uint16_t arrayStep=1; // Array change steps to store it in array steps 
 uint16_t joint0[180]; // Array for Store steps for one servo 
 uint16_t top = 179; // max steps
 uint16_t ste=0;
@@ -37,29 +37,34 @@ void setup()
 }
 void loop()
 {
-    readpot(); 
-    free_mode();
+    // readpot(); 
+    // free_mode();
     while (digitalRead(RECORD_BUTT)==true)
         {
             working();
             readpot();
             free_mode();
-            if(arrayStep<top)
+            // Check if Position changed joint0[arrayStep-1]!=ist[0]
+            if(joint0[arrayStep-1]!=ist[0] && arrayStep<top )
                 {
+                    Serial.println( ist[0]);
+                    Serial.println(   joint0[arrayStep-1] );
                     record();
+                    arrayStep+=1;
                 }
-            arrayStep+=1;
+            
             delay(100);
+
         }
     while (digitalRead(PLAY_BUTT)==true)
-        {
-            working();
-            if(ste<top)
                 {
-                    play();
-                    ste+=1;
-                    delay(25);
-                }
+                    working();
+                    if(ste<arrayStep)
+                        {
+                            play();
+                            ste+=1;
+                            delay(35);
+                        }
             else ste=0;
         }
 
@@ -71,7 +76,7 @@ void loop()
    when Servo  change angle */  
 void working()
 {
-    Serial.println("Working ");
+    Serial.println("Working nee ");
     digitalWrite(LED_WORKING, HIGH);
     digitalWrite(LED_STANDBY, LOW);
   
@@ -112,11 +117,13 @@ void record()
 
 void play()
 {
+    Serial.print("Playing: ");
     servo_A.write( joint0[ste]);
+    Serial.print(joint0[ste]);
 }
 
 void free_mode()
 {
-    servo_A.write(ist[0] );
+    servo_A.write(ist[0]);
 }
 
