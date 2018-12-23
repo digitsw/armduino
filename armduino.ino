@@ -1,26 +1,25 @@
 #include <Servo.h> 
 #include "functions.h"
-//Servo Motors PINS 3/5/6/9
+/*Servo Motors PINS 3/5/6/9*/
 #define SER_A_PIN 3
 #define SER_B_PIN 5
 #define SER_C_PIN 6
 #define SER_D_PIN 9
-//LED PINS 12/13
+/*LED PINS 12/13*/
 #define LED_WORKING 13
 #define LED_STANDBY 12
-//Buttons PINS 2/11
+/*Buttons PINS 2/11*/
 #define RECORD_BUTT 11
 #define PLAY_BUTT 2
-#define INIT_ANGLE 90 //Defualt Angle 90 degree
-uint16_t potpin = 0;  // Potentiometer input PIN 0
-uint16_t SensVal[4]; // Servo Arrays for Store  Analog Value
-uint16_t ist[4] ; // Servo to store position  after Mapping Analog Value 
-uint16_t arrayStep=1; // Array change steps to store it in array steps 
-uint16_t joint0[180]; // Array for Store steps for one servo 
-uint16_t top = 179; // max steps
+#define INIT_ANGLE 90 /*Defualt Angle 90 degree*/
+uint16_t potpin = 0;  /* Potentiometer input PIN 0*/
+uint16_t val[4]; /* Servo Arrays for Store  Analog Value */
+uint16_t map_val[4] ; /* Servo to store position  after Mapping Analog Value */
+uint16_t step=1; /* Array change steps to store it in array steps */
+uint16_t sero_pos[180]; /* Array for Store steps for one servo*/ 
+uint16_t step_max = 179; /* max steps */
 uint16_t ste=0;
 Servo servo_A,servo_B,servo_C,servo_D;
-
 void setup()
 {
     pinMode(RECORD_BUTT, INPUT);
@@ -32,7 +31,7 @@ void setup()
     servo_B.attach(SER_B_PIN); 
     servo_C.attach(SER_C_PIN);
     servo_D.attach(SER_D_PIN); 
-    init_servo(); // set & write all servo angle to INIT_ANGLE
+    init_servo(); /*set & write all servo angle to INIT_ANGLE*/
     Serial.begin(9600);
 }
 void loop()
@@ -44,22 +43,21 @@ void loop()
             working();
             readpot();
             free_mode();
-            // Check if Position changed joint0[arrayStep-1]!=ist[0]
-            if(joint0[arrayStep-1]!=ist[0] && arrayStep<top )
+            /* Check if Position changed sero_pos[step-1]!=map_val[0] */
+            if(sero_pos[step-1]!=map_val[0] && step<step_max )
                 {
-                    Serial.println( ist[0]);
-                    Serial.println(   joint0[arrayStep-1] );
+                    Serial.println( map_val[0]);
+                    Serial.println(   sero_pos[step-1] );
                     record();
-                    arrayStep+=1;
+                    step+=1;
                 }
             
             delay(100);
-
         }
     while (digitalRead(PLAY_BUTT)==true)
                 {
                     working();
-                    if(ste<arrayStep)
+                    if(ste<step)
                         {
                             play();
                             ste+=1;
@@ -67,19 +65,15 @@ void loop()
                         }
             else ste=0;
         }
-
-
-
 }
 /* working() 
-   funtion for turn on LED working
-   when Servo  change angle */  
+ * function to turn on / turn of LED working
+ *  when Servo is change angle */  
 void working()
 {
     Serial.println("Working nee ");
     digitalWrite(LED_WORKING, HIGH);
     digitalWrite(LED_STANDBY, LOW);
-  
 }
 void init_servo()
 {
@@ -90,40 +84,34 @@ void init_servo()
     servo_D.write(INIT_ANGLE);
     delay(2000);
     standby();
-  
 }
-
-
 void standby()
 {
     digitalWrite(LED_WORKING, LOW);
     digitalWrite(LED_STANDBY, HIGH);
    
 }
-
 void readpot()
 {
-    SensVal[0] = analogRead(potpin); 
-    ist[0]  = map(SensVal[0], 0, 1023, 0, 180);     
+    val[0] = analogRead(potpin); 
+    map_val[0]  = map(val[0], 0, 1023, 0, 180);     
 }
 void record()
 {
     Serial.print("Recording: ");
-    joint0[arrayStep] = ist[0];
-    Serial.print("record arrayStep: ");
-    Serial.println(arrayStep);
+    sero_pos[step] = map_val[0];
+    Serial.print("record step: ");
+    Serial.println(step);
  
 }
-
 void play()
 {
     Serial.print("Playing: ");
-    servo_A.write( joint0[ste]);
-    Serial.print(joint0[ste]);
+    servo_A.write( sero_pos[ste]);
+    Serial.print(sero_pos[ste]);
 }
-
 void free_mode()
 {
-    servo_A.write(ist[0]);
+    servo_A.write(map_val[0]);
 }
 
