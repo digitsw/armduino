@@ -1,13 +1,17 @@
 #include <Servo.h> 
 #include "common.h"
 
-uint16_t potpin = 0;  /* Potentiometer input PIN 0*/
 uint16_t val[4]; /* Servo array to store the analog values */
 uint16_t map_val[4] ; /* Servo array to store the position after mapping the analog value */
-uint16_t step=1; /* Array's "change steps" to store it in array steps */
+uint16_t step[4]={0,0,0,0}; /* Array's "change steps" to store it in array steps */
 uint16_t sero_pos[180]; /* An array  Store the steps for a one servo*/ 
+uint16_t sero_pos1[180];
+uint16_t sero_pos2[180];
+uint16_t sero_pos3[180];
+uint16_t sero_pos4[180]; 
 uint16_t step_max = 179; /* Max steps */
 uint16_t ste=0;
+
 Servo servo_A,servo_B,servo_C,servo_D;
 
 void setup()
@@ -21,39 +25,38 @@ void setup()
     servo_B.attach(SER_B_PIN); 
     servo_C.attach(SER_C_PIN);
     servo_D.attach(SER_D_PIN); 
-    init_servo(); /* set & write all servo angles to INIT_ANGLE*/
+    //  init_servo(); /* set & write all servo angles to INIT_ANGLE*/
     Serial.begin(9600);
 }
 
 void loop()
 {
-    // readpot(); 
-    // free_mode();
+    standby();
     while (digitalRead(RECORD_BUTT)==true)
         {
             working();
             readpot();
             free_mode();
             /* Check if the position changed sero_pos[step-1]!=map_val[0] */
-            if(sero_pos[step-1]!=map_val[0] && step<step_max )
+            if(sero_pos[step[0]-1]!=map_val[0] && step[0]<step_max )
                 {
-                    Serial.println( map_val[0]);
-                    Serial.println(   sero_pos[step-1] );
-                    record();
-                    step+=1;
+                    Serial.println(map_val[0]);
+                    Serial.println(sero_pos[step[0]-1]);
+                    record(0);
+                    step[0]++;
                 }
             
             delay(100);
         }
     while (digitalRead(PLAY_BUTT)==true)
+        {
+            working();
+            if(ste<step[0])
                 {
-                    working();
-                    if(ste<step)
-                        {
-                            play();
-                            ste+=1;
-                            delay(35);
-                        }
+                    play(0);
+                    ste+=1;
+                    delay(100);
+                }
             else ste=0;
         }
 }
@@ -63,7 +66,7 @@ void loop()
  *  when Servo changes angle */  
 void working()
 {
-    Serial.println("Working nee ");
+    Serial.println("Working ");
     digitalWrite(LED_WORKING, HIGH);
     digitalWrite(LED_STANDBY, LOW);
 }
@@ -88,28 +91,30 @@ void standby()
 
 void readpot()
 {
-    val[0] = analogRead(potpin); 
-    map_val[0]  = map(val[0], 0, 1023, 0, 180);     
+    val[0] = analogRead(POT_PIN0); 
+    map_val[0]  = map(val[0], 0, 1023, 0, 180);
+    val[1] = analogRead(POT_PIN1); 
+    map_val[1]  = map(val[1], 0, 1023, 0, 180);
 }
 
-void record()
+void record(int ser)
 {
     Serial.print("Recording: ");
-    sero_pos[step] = map_val[0];
+    sero_pos[step[ser]] = map_val[ser];
     Serial.print("record step: ");
-    Serial.println(step);
+    Serial.println(step[ser]);
  
 }
-
-void play()
+void play(int ser)
 {
     Serial.print("Playing: ");
-    servo_A.write( sero_pos[ste]);
-    Serial.print(sero_pos[ste]);
+    servo_A.write( sero_pos[ser]);
+    Serial.print(sero_pos[ser]);
 }
 
 void free_mode()
 {
     servo_A.write(map_val[0]);
+    servo_B.write(map_val[1]);
 }
 

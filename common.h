@@ -1,5 +1,10 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
+/* Potentiometer input PINS */
+#define POT_PIN0 0  
+#define POT_PIN1 1
+#define POT_PIN2 2
+#define POT_PIN3 3
 /*Servo Motors PINS 3/5/6/9*/
 #define SER_A_PIN 3
 #define SER_B_PIN 5
@@ -17,6 +22,6 @@ extern void working();
 extern void readpot();
 extern void free_mode();
 extern void standby();
-extern void record();
-extern void play();
+extern void record(int ser);
+extern void play(int ser);
 #endif
